@@ -11,5 +11,5 @@ def test_criar_cliente():
         "telefone": "(11) 99999-9999"
     })
  assert response.status_code == 201
- assert response.json()["nome"] == "Lucas Silva" 
+ assert response.json()["nome"] == "João Silva" 
     
