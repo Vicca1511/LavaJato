@@ -1,4 +1,4 @@
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, field_validator, computed_field
 from typing import Optional, List
 from datetime import datetime
 
@@ -33,7 +33,12 @@ class PortePreco(PortePrecoBase):
 class PortePrecoResponse(PortePrecoBase):
     id: int
     servico_id: int
-    valor_final: float
+    valor_base: float  # Adicionar valor_base para cálculo
+    
+    @computed_field
+    @property
+    def valor_final(self) -> float:
+        return round(self.valor_base * self.multiplicador, 2)
 
     class Config:
         from_attributes = True
@@ -80,7 +85,14 @@ class ServicoResponse(ServicoBase):
     id: int
     ativo: bool
     portes_preco: List[PortePrecoResponse]
-    preco_medio: float
+    
+    @computed_field
+    @property
+    def preco_medio(self) -> float:
+        if self.portes_preco:
+            multiplicadores = [pp.multiplicador for pp in self.portes_preco]
+            return round(self.valor_base * (sum(multiplicadores) / len(multiplicadores)), 2)
+        return self.valor_base
 
     class Config:
         from_attributes = True
