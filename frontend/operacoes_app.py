@@ -45,7 +45,7 @@ def get_servicos():
 
 def get_fila():
     try:
-        response = requests.get(f"{API_BASE}/agendamentos/fila")
+        response = requests.get(f"{API_BASE}/ordens-servico/fila")
         if response.status_code in [200, 201]:
             return response.json()
         return {"em_espera": [], "em_lavagem": [], "finalizados": []}
@@ -54,7 +54,7 @@ def get_fila():
 
 def criar_agendamento(veiculo_id, servico_id, observacoes):
     try:
-        response = requests.post(f"{API_BASE}/agendamentos/", json={
+        response = requests.post(f"{API_BASE}/ordens-servico/", json={
             "veiculo_id": veiculo_id,
             "servico_id": servico_id,
             "observacoes": observacoes
@@ -67,28 +67,28 @@ def criar_agendamento(veiculo_id, servico_id, observacoes):
 
 def iniciar_servico(agendamento_id):
     try:
-        response = requests.post(f"{API_BASE}/agendamentos/{agendamento_id}/iniciar")
+        response = requests.post(f"{API_BASE}/ordens-servico/{agendamento_id}/iniciar")
         return response.status_code in [200, 201]
     except:
         return False
 
 def finalizar_servico(agendamento_id):
     try:
-        response = requests.post(f"{API_BASE}/agendamentos/{agendamento_id}/finalizar")
+        response = requests.post(f"{API_BASE}/ordens-servico/{agendamento_id}/finalizar")
         return response.status_code in [200, 201]
     except:
         return False
 
 def entregar_veiculo(agendamento_id):
     try:
-        response = requests.post(f"{API_BASE}/agendamentos/{agendamento_id}/entregar")
+        response = requests.post(f"{API_BASE}/ordens-servico/{agendamento_id}/entregar")
         return response.status_code in [200, 201]
     except:
         return False
 
 def gerar_pix(agendamento_id):
     try:
-        response = requests.get(f"{API_BASE}/agendamentos/{agendamento_id}/pix")
+        response = requests.get(f"{API_BASE}/ordens-servico/{agendamento_id}/pix")
         if response.status_code in [200, 201]:
             return response.json()
         return None
@@ -97,14 +97,14 @@ def gerar_pix(agendamento_id):
 
 def confirmar_pagamento(agendamento_id):
     try:
-        response = requests.post(f"{API_BASE}/agendamentos/{agendamento_id}/confirmar-pagamento")
+        response = requests.post(f"{API_BASE}/ordens-servico/{agendamento_id}/confirmar-pagamento")
         return response.status_code in [200, 201]
     except:
         return False
 
 def notificar_whatsapp(agendamento_id):
     try:
-        response = requests.post(f"{API_BASE}/agendamentos/{agendamento_id}/notificar-whatsapp")
+        response = requests.post(f"{API_BASE}/ordens-servico/{agendamento_id}/notificar-whatsapp")
         if response.status_code in [200, 201]:
             return response.json()
         return None
@@ -288,17 +288,17 @@ elif opcao == "Ver Fila":
         else:
             st.info("Nenhum servico finalizado")
     
-    # Mostrar QR Code PIX se gerado - SEPARADO DOS BOTÕES
+    # Mostrar QR Code PIX se gerado - SEPARADO DOS BOTÃES
     st.markdown("---")
     if st.session_state.pix_data:
-        st.subheader("��� QR Codes PIX Gerados")
+        st.subheader("í²° QR Codes PIX Gerados")
         for agendamento_id, pix_info in st.session_state.pix_data.items():
             if isinstance(pix_info, dict):
                 with st.expander(f"PIX - Agendamento {agendamento_id}"):
                     st.write(f"**Valor:** R$ {pix_info.get('valor', 0):.2f}")
                     st.write(f"**Descricao:** {pix_info.get('descricao', 'N/A')}")
                     st.write(f"**Codigo de confirmacao:** {pix_info.get('codigo_confirmacao', 'N/A')}")
-                    st.code(pix_info.get('qr_code', 'QR Code não disponível'))
+                    st.code(pix_info.get('qr_code', 'QR Code nÃ£o disponÃ­vel'))
                     
                     if st.button(f"Fechar PIX {agendamento_id}", key=f"close_pix_{agendamento_id}"):
                         del st.session_state.pix_data[agendamento_id]
