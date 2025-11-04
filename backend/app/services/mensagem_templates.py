@@ -4,11 +4,11 @@ class MensagemTemplates:
 
     @staticmethod
     def servico_agendado(cliente_nome: str, veiculo_placa: str, data_hora: str, servico: str) -> str:
-        return f"""LavaJato - Agendamento Confirmado
+        return f"""LavaJato - OrdemServico Confirmado
 
 Olá {cliente_nome}!
 
-Seu agendamento foi confirmado:
+Seu ordem_servico foi confirmado:
 
 Data/Hora: {data_hora}
 Veículo: {veiculo_placa}
@@ -35,12 +35,12 @@ Obrigado pela preferência!
 Equipe LavaJato"""
 
     @staticmethod
-    def lembrete_agendamento(cliente_nome: str, data_hora: str, servico: str) -> str:
+    def lembrete_ordem_servico(cliente_nome: str, data_hora: str, servico: str) -> str:
         return f"""LavaJato - Lembrete
 
 Olá {cliente_nome}!
 
-Lembramos do seu agendamento:
+Lembramos do seu ordem_servico:
 
 Data/Hora: {data_hora}
 Serviço: {servico}
