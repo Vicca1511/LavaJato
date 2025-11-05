@@ -31,7 +31,7 @@ class OrdemServico(Base):
     notificado_whatsapp = Column(Boolean, default=False)
 
     # Relacionamentos
-    veiculo = relationship("Veiculo", back_populates="ordem_servicos")
+    veiculo = relationship("Veiculo")  # Sem back_populates
     servico = relationship("Servico")
 
     def __repr__(self):

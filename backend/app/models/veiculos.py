@@ -15,7 +15,7 @@ class Veiculo(Base):
 
     # Relacionamentos
     cliente = relationship("Cliente", back_populates="veiculos")
-    ordens_servico = relationship("OrdemServico", back_populates="veiculo")
+    # ordem_servico = relationship("OrdemServico")  # Temporariamente comentada
 
     def __repr__(self):
         return f"<Veiculo {self.placa} - {self.modelo}>"

@@ -1,22 +1,21 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+import os
 
-from .core.config import settings
+SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./lavajato.db")
 
-# Criar engine do banco de dados
 engine = create_engine(
-    settings.DATABASE_URL, 
-    connect_args={"check_same_thread": False} if "sqlite" in settings.DATABASE_URL else {}
+    SQLALCHEMY_DATABASE_URL,
+    connect_args={"check_same_thread": False},
+    pool_pre_ping=True,
+    echo=False,
+    future=True
 )
 
-# Criar SessionLocal
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-# Criar Base para os modelos
 Base = declarative_base()
 
-# Dependency para obter sessão do banco
 def get_db():
     db = SessionLocal()
     try:

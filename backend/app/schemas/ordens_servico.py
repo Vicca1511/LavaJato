@@ -1,14 +1,7 @@
 from pydantic import BaseModel, field_validator
 from typing import Optional, List
 from datetime import datetime
-from enum import Enum
-
-class StatusOrdemServico(str, Enum):
-    AGUARDANDO = "aguardando"
-    EM_LAVAGEM = "em_lavagem"
-    FINALIZADO = "finalizado"
-    ENTREGUE = "entregue"
-    CANCELADO = "cancelado"
+from app.models.ordens_servico import StatusOrdemServico  # Importar do model
 
 class OrdemServicoBase(BaseModel):
     veiculo_id: int
@@ -22,25 +15,29 @@ class OrdemServicoResponse(OrdemServicoBase):
     id: int
     status: StatusOrdemServico
     valor_cobrado: float
-    posicao_fila: Optional[int]
+    posicao_fila: Optional[int] = None
     data_entrada: datetime
-    data_inicio_servico: Optional[datetime]
-    data_fim_servico: Optional[datetime]
-    data_entrega: Optional[datetime]
-    codigo_pagamento: Optional[str]
-    codigo_confirmacao: Optional[str]
-    pago: bool
-    notificado_whatsapp: bool
-    tempo_espera: float
-    tempo_servico: float
+    data_inicio_servico: Optional[datetime] = None
+    data_fim_servico: Optional[datetime] = None
+    data_entrega: Optional[datetime] = None
+    codigo_pagamento: Optional[str] = None  # Tornar opcional
+    codigo_confirmacao: Optional[str] = None
+    pago: bool = False
+    notificado_whatsapp: bool = False
+    tempo_espera: float = 0.0
+    tempo_servico: float = 0.0
 
     class Config:
         from_attributes = True
 
 class FilaResponse(BaseModel):
-    em_espera: List[OrdemServicoResponse]
-    em_lavagem: List[OrdemServicoResponse]
-    finalizados: List[OrdemServicoResponse]
+    id: int
+    posicao_fila: int
+    status: str
+    veiculo_placa: str
+    servico_nome: str
+    valor_cobrado: float
+    data_entrada: datetime
 
 class WhatsAppMessage(BaseModel):
     telefone: str

@@ -1,0 +1,20 @@
+[33m8edac63[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mdevelop[m[33m, [m[1;31morigin/develop[m[33m)[m chore: remover arquivos temporarios e duplicados
+[33mfb2eb60[m feat: implementar sistema WhatsApp em modo simulacao
+[33mf7a7d13[m feat: preparing structure to apply wtapp msg
+[33m91384ea[m feat: Sistema operacional completo com correções PIX
+[33mb7130d9[m feat: Sistema LavaJato completo v1.0
+[33m0ca366b[m system update
+[33m4c07a94[m fix: implement dynamic price calculations with computed fields
+[33m7fb33ba[m feat: fix API routing and add categories endpoint
+[33m8b1419e[m Backup done
+[33maad3530[m chore: add backup directories to gitignore
+[33m4e1e909[m commit
+[33mace42d5[m feat: porte preco, servicos n categorias created
+[33m51694d9[m fix: updated init archives
+[33m3a91957[m del : archive init deleted
+[33m674553b[m feat: main updated
+[33ma62cf31[m feat: servicos api n schema created
+[33m117a3a0[m feat:servicos n portepreco models created
+[33m01db741[m feat: create standalone executable package
+[33m22a397d[m backend structured including changes to support veiculos session!
+[33m0f3dffd[m  frontend create and testes backend develop

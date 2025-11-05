@@ -5,7 +5,7 @@ import pandas as pd
 st.set_page_config(page_title="LavaJato System", page_icon="🚗")
 st.title("🚗 LavaJato System")
 
-API_URL = "http://localhost:8000"
+API_URL = "http://localhost:8000/api"
 
 # Menu simples
 option = st.selectbox("Menu", ["Cadastrar Cliente", "Ver Clientes"])

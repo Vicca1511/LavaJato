@@ -4,7 +4,7 @@ from typing import List
 from app.database import get_db
 from app.models.servicos import Servico
 from app.models.porte_preco import PortePreco
-from app.schemas.servicos import ServicoCreate, ServicoResponse, PortePrecoResponse
+from app.schemas.servicos import ServicoCreate, ServicoResponse, PortePrecoResponse, ServicoUpdate
 
 router = APIRouter(tags=["servicos"])
 
@@ -44,10 +44,39 @@ def obter_servico(servico_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Serviço não encontrado")
     return preparar_resposta_servico(servico, db)
 
+@router.put("/{servico_id}", response_model=ServicoResponse)
+def atualizar_servico(servico_id: int, servico_data: ServicoUpdate, db: Session = Depends(get_db)):
+    servico = db.query(Servico).filter(Servico.id == servico_id).first()
+    if not servico:
+        raise HTTPException(status_code=404, detail="Serviço não encontrado")
+    
+    # Atualizar campos do serviço
+    update_data = servico_data.model_dump(exclude_unset=True)
+    for field, value in update_data.items():
+        setattr(servico, field, value)
+    
+    db.commit()
+    db.refresh(servico)
+    return preparar_resposta_servico(servico, db)
+
+@router.delete("/{servico_id}")
+def excluir_servico(servico_id: int, db: Session = Depends(get_db)):
+    servico = db.query(Servico).filter(Servico.id == servico_id).first()
+    if not servico:
+        raise HTTPException(status_code=404, detail="Serviço não encontrado")
+    
+    # Excluir portes_preco primeiro (cascade)
+    db.query(PortePreco).filter(PortePreco.servico_id == servico_id).delete()
+    
+    # Excluir serviço
+    db.delete(servico)
+    db.commit()
+    return {"message": "Serviço excluído com sucesso"}
+
 def preparar_resposta_servico(servico: Servico, db: Session) -> ServicoResponse:
     """Prepara a resposta do serviço com cálculos dinâmicos"""
     portes_preco = db.query(PortePreco).filter(PortePreco.servico_id == servico.id).all()
-    
+
     # Criar lista de PortePrecoResponse com valor_base para cálculo
     portes_response = []
     for porte in portes_preco:
@@ -59,7 +88,7 @@ def preparar_resposta_servico(servico: Servico, db: Session) -> ServicoResponse:
             "valor_base": servico.valor_base  # Passar valor_base para cálculo
         }
         portes_response.append(PortePrecoResponse(**porte_dict))
-    
+
     # Criar resposta do serviço
     servico_dict = {
         "id": servico.id,
@@ -71,5 +100,5 @@ def preparar_resposta_servico(servico: Servico, db: Session) -> ServicoResponse:
         "ativo": servico.ativo,
         "portes_preco": portes_response
     }
-    
+
     return ServicoResponse(**servico_dict)
