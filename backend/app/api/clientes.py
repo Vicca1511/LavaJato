@@ -4,7 +4,7 @@ from app.database import get_db
 from app.models.clientes import Cliente
 from app.schemas.clientes import ClienteCreate, ClienteResponse
 
-router = APIRouter()
+router = APIRouter(tags=["Clientes"])
 
 @router.post("", response_model=ClienteResponse, status_code=status.HTTP_201_CREATED)
 def criar_cliente(cliente: ClienteCreate, db: Session = Depends(get_db)):

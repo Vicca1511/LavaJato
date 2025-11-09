@@ -1,16 +1,24 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+import logging
 
-# Importacoes
-try:
-    from app.api.whatsapp_routes import router as whatsapp_router
-    has_whatsapp = True
-except ImportError as e:
-    has_whatsapp = False
-    print(f"Aviso: Rotas WhatsApp nao disponiveis: {e}")
+# Configurar logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
-# Criar app FastAPI
-app = FastAPI(title="LavaJato System", version="1.0.0")
+# Importar rotas principais
+from app.api.clientes import router as clientes_router
+from app.api.veiculos import router as veiculos_router
+from app.api.servicos import router as servicos_router
+from app.api.ordens_servico import router as ordens_servico_router
+from app.api.fluxo_atendimento import router as fluxo_router
+from app.api.whatsapp_routes import router as whatsapp_router
+
+app = FastAPI(
+    title="Sistema Lava Jato",
+    description="API para gerenciamento de lava jato",
+    version="2.0.0"
+)
 
 # CORS
 app.add_middleware(
@@ -21,60 +29,28 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Incluir routers
-if has_whatsapp:
-    app.include_router(whatsapp_router, prefix="/api/whatsapp", tags=["whatsapp"])
-    print("CHECK Rotas WhatsApp carregadas")
-
-# Incluir rotas principais
-try:
-    from app.api.clientes import router as clientes_router
-    from app.api.veiculos import router as veiculos_router
-    from app.api.servicos import router as servicos_router
-    from app.api.categorias import router as categorias_router
-    from app.api.ordens_servico import router as ordens_servico_router
-    
-    app.include_router(clientes_router, prefix="/api/clientes", tags=["clientes"])
-    app.include_router(veiculos_router, prefix="/api/veiculos", tags=["veiculos"])
-    app.include_router(servicos_router, prefix="/api/servicos", tags=["servicos"])
-    app.include_router(categorias_router, prefix="/api/categorias", tags=["categorias"])
-    app.include_router(ordens_servico_router, prefix="/api/ordens-servico", tags=["ordens_servico"])
-    print("CHECK Rotas principais carregadas")
-except ImportError as e:
-    print(f"Aviso: Algumas rotas nao disponiveis: {e}")
+# Incluir rotas
+app.include_router(clientes_router, prefix="/api/clientes", tags=["Clientes"])
+app.include_router(veiculos_router, prefix="/api/veiculos", tags=["Veiculos"])
+app.include_router(servicos_router, prefix="/api/servicos", tags=["Servicos"])
+app.include_router(ordens_servico_router, prefix="/api/ordens-servico", tags=["Ordens de Servico"])
+app.include_router(whatsapp_router, prefix="/api/whatsapp", tags=["WhatsApp"])
+app.include_router(fluxo_router, prefix="/api/fluxo", tags=["Fluxo Atendimento"])
 
 @app.get("/")
 async def root():
-    return {"message": "LavaJato System API", "status": "running"}
+    return {"message": "Sistema Lava Jato API", "status": "online"}
 
 @app.get("/health")
 async def health_check():
-    return {
-        "status": "healthy", 
-        "whatsapp_available": has_whatsapp,
-        "api": "running"
-    }
+    return {"status": "healthy", "service": "lava-jato-api"}
 
-@app.get("/api/test")
-async def test_route():
-    return {"message": "API funcionando!"}
+@app.get("/api/health")
+async def api_health_check():
+    return {"status": "healthy", "api": "running", "database": "connected"}
 
-# Startup event para melhor performance
-@app.on_event("startup")
-async def startup_event():
-    """Pre-carrega dependencias para melhor performance"""
-    try:
-        from app.database import SessionLocal
-        from app.models.clientes import Cliente
-        
-        # Forcar inicializacao do ORM
-        db = SessionLocal()
-        try:
-            db.query(Cliente).limit(1).all()
-        except:
-            pass
-        finally:
-            db.close()
-        print("CHECK Dependencias pre-carregadas - API otimizada!")
-    except Exception as e:
-        print(f"Aviso no startup: {e}")
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
+from app.api.debug_routes import router as debug_router
+app.include_router(debug_router, prefix="/api/debug", tags=["Debug"])

@@ -4,7 +4,7 @@ from pydantic import BaseModel
 from typing import List, Dict
 from app.services.whatsapp_manager import whatsapp_manager
 
-router = APIRouter()
+router = APIRouter(tags=["WhatsApp"])
 
 class ServicoItem(BaseModel):
     nome: str

@@ -6,7 +6,7 @@ from app.models.servicos import Servico
 from app.models.porte_preco import PortePreco
 from app.schemas.servicos import ServicoCreate, ServicoResponse, PortePrecoResponse, ServicoUpdate
 
-router = APIRouter(tags=["servicos"])
+router = APIRouter(tags=["Servicos"])
 
 @router.post("/", response_model=ServicoResponse, status_code=status.HTTP_201_CREATED)
 def criar_servico(servico: ServicoCreate, db: Session = Depends(get_db)):

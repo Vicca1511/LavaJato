@@ -1,7 +1,15 @@
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel
 from typing import Optional, List
 from datetime import datetime
-from app.models.ordens_servico import StatusOrdemServico  # Importar do model
+from enum import Enum
+
+class StatusOrdemServico(str, Enum):
+    SOLICITADO = "SOLICITADO"
+    CONFIRMADO = "CONFIRMADO"
+    EM_ANDAMENTO = "EM_ANDAMENTO"
+    AGUARDANDO_PAGAMENTO = "AGUARDANDO_PAGAMENTO"
+    FINALIZADO = "FINALIZADO"
+    CANCELADO = "CANCELADO"
 
 class OrdemServicoBase(BaseModel):
     veiculo_id: int
@@ -11,21 +19,21 @@ class OrdemServicoBase(BaseModel):
 class OrdemServicoCreate(OrdemServicoBase):
     pass
 
-class OrdemServicoResponse(OrdemServicoBase):
+# SCHEMA CORRIGIDO - que combina com o modelo REAL
+class OrdemServicoResponse(BaseModel):
     id: int
-    status: StatusOrdemServico
-    valor_cobrado: float
-    posicao_fila: Optional[int] = None
+    cliente_id: int
+    veiculo: str
+    placa: str
+    status: str
+    valor_total: float
+    observacoes: Optional[str] = None
     data_entrada: datetime
-    data_inicio_servico: Optional[datetime] = None
-    data_fim_servico: Optional[datetime] = None
-    data_entrega: Optional[datetime] = None
-    codigo_pagamento: Optional[str] = None  # Tornar opcional
-    codigo_confirmacao: Optional[str] = None
-    pago: bool = False
+    data_inicio: Optional[datetime] = None
+    data_fim: Optional[datetime] = None
     notificado_whatsapp: bool = False
-    tempo_espera: float = 0.0
-    tempo_servico: float = 0.0
+    etapa_atual: Optional[str] = None
+    progresso: int = 0
 
     class Config:
         from_attributes = True
@@ -38,6 +46,9 @@ class FilaResponse(BaseModel):
     servico_nome: str
     valor_cobrado: float
     data_entrada: datetime
+
+    class Config:
+        from_attributes = True
 
 class WhatsAppMessage(BaseModel):
     telefone: str

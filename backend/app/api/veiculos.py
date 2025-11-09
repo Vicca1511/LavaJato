@@ -6,7 +6,7 @@ from app.models.veiculos import Veiculo
 from app.models.clientes import Cliente
 from app.schemas.veiculos import VeiculoCreate, VeiculoResponse, VeiculoUpdate
 
-router = APIRouter(tags=["veiculos"])
+router = APIRouter(tags=["Veiculos"])
 
 @router.post("/", response_model=VeiculoResponse, status_code=status.HTTP_201_CREATED)
 def criar_veiculo(veiculo: VeiculoCreate, db: Session = Depends(get_db)):
