@@ -1,0 +1,111 @@
+import streamlit as st
+import requests
+import time
+
+API_BASE = "http://localhost:8000/api"
+
+def api_request(endpoint, method="GET", data=None):
+    try:
+        url = f"{API_BASE}{endpoint}"
+        if method == "GET":
+            response = requests.get(url)
+        elif method == "POST":
+            response = requests.post(url, json=data)
+        return response.json() if response.status_code in [200, 201] else None
+    except:
+        return None
+
+def obter_etapas_servico(servico_id):
+    """Retorna etapas espec√≠ficas baseadas no servi√ßo"""
+    etapas_por_servico = {
+        1: ["Recep√ß√£o", "Pr√©-lavagem", "Lavagem Externa", "Secagem", "Inspe√ß√£o Final"],
+        2: ["Recep√ß√£o", "Pr√©-lavagem", "Lavagem Externa", "Lavagem Interna", "Secagem", "Inspe√ß√£o Final"],
+        3: ["Recep√ß√£o", "Pr√©-lavagem", "Lavagem Externa", "Lavagem Interna", "Secagem", "Polimento", "Enceramento", "Inspe√ß√£o Final"]
+    }
+    return etapas_por_servico.get(servico_id, ["Recep√ß√£o", "Execu√ß√£o do Servi√ßo", "Inspe√ß√£o Final"])
+
+def main():
+    st.set_page_config(page_title="Controle Opera√ß√µes", page_icon="Ìª†Ô∏è", layout="wide")
+    st.title("Ìª†Ô∏è Controle de Opera√ß√µes")
+    
+    if st.button("Ì¥Ñ Atualizar"):
+        st.rerun()
+    
+    ordens = api_request("/ordens-servico") or []
+    fila = api_request("/ordens-servico/fila") or []
+    servicos = api_request("/servicos") or []
+    
+    tab1, tab2 = st.tabs(["Ì≥ä Painel Tempo Real", "‚öôÔ∏è Controle de Etapas"])
+    
+    with tab1:
+        st.subheader("ÌæØ Servi√ßos em Andamento")
+        
+        if fila:
+            for ordem in fila:
+                with st.container():
+                    col1, col2, col3 = st.columns([3, 2, 1])
+                    with col1:
+                        st.write(f"**Ordem #{ordem['id']}**")
+                        st.write(f"Ì¥Ñ {ordem['veiculo_placa']}")
+                    with col2:
+                        st.write("**Status:** Ì¥µ Em Andamento")
+                    with col3:
+                        if st.button("‚úÖ Finalizar", key=f"end_{ordem['id']}"):
+                            st.success("Servi√ßo finalizado!")
+                            time.sleep(1)
+                            st.rerun()
+                    st.markdown("---")
+        else:
+            st.info("Ìæâ Nenhum servi√ßo em andamento")
+            
+        ordens_solicitadas = [o for o in ordens if o.get('status') == 'SOLICITADO']
+        if ordens_solicitadas:
+            st.subheader("Ì≥ã Ordens Aguardando In√≠cio")
+            for ordem in ordens_solicitadas:
+                col1, col2 = st.columns([3, 1])
+                with col1:
+                    st.write(f"**#{ordem['id']}** - {ordem.get('placa', 'N/A')}")
+                with col2:
+                    if st.button("‚ñ∂Ô∏è Iniciar", key=f"start_{ordem['id']}"):
+                        st.success("Servi√ßo iniciado!")
+                        time.sleep(1)
+                        st.rerun()
+    
+    with tab2:
+        st.subheader("‚öôÔ∏è Controle de Etapas")
+        
+        ordens_ativas = [o for o in ordens if o.get('status') == 'EM_ANDAMENTO']
+        
+        if ordens_ativas:
+            for ordem in ordens_ativas:
+                servico_id = ordem.get('servico_id')
+                etapas = obter_etapas_servico(servico_id)
+                
+                with st.expander(f"Ì¥ß Ordem #{ordem['id']} - {ordem['veiculo']}", expanded=True):
+                    servico_nome = [s for s in servicos if s['id'] == servico_id]
+                    if servico_nome:
+                        st.write(f"**Servi√ßo:** {servico_nome[0]['nome']}")
+                    
+                    progresso_atual = 1
+                    
+                    for i, etapa in enumerate(etapas):
+                        col1, col2, col3 = st.columns([1, 3, 2])
+                        with col1:
+                            st.write("‚úÖ" if i < progresso_atual else "Ì¥Ñ" if i == progresso_atual else "‚è≥")
+                        with col2:
+                            st.write(f"**{etapa}**")
+                        with col3:
+                            if i == progresso_atual:
+                                if st.button("Concluir", key=f"etapa_{ordem['id']}_{i}"):
+                                    st.success(f"Etapa '{etapa}' conclu√≠da!")
+                                    time.sleep(1)
+                                    st.rerun()
+                    
+                    if etapas:
+                        st.progress(progresso_atual / len(etapas))
+                        st.write(f"**Progresso: {progresso_atual}/{len(etapas)} etapas**")
+        else:
+            st.info("Ìæâ Nenhuma ordem ativa")
+
+if __name__ == "__main__":
+    main()
