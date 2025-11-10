@@ -11,7 +11,7 @@ from app.api.clientes import router as clientes_router
 from app.api.veiculos import router as veiculos_router
 from app.api.servicos import router as servicos_router
 from app.api.ordens_servico import router as ordens_servico_router
-from app.api.fluxo_atendimento import router as fluxo_router
+# from app.api.fluxo_atendimento import router as fluxo_router
 from app.api.whatsapp_routes import router as whatsapp_router
 
 app = FastAPI(
@@ -35,7 +35,7 @@ app.include_router(veiculos_router, prefix="/api/veiculos", tags=["Veiculos"])
 app.include_router(servicos_router, prefix="/api/servicos", tags=["Servicos"])
 app.include_router(ordens_servico_router, prefix="/api/ordens-servico", tags=["Ordens de Servico"])
 app.include_router(whatsapp_router, prefix="/api/whatsapp", tags=["WhatsApp"])
-app.include_router(fluxo_router, prefix="/api/fluxo", tags=["Fluxo Atendimento"])
+# app.include_router(fluxo_router, prefix="/api/fluxo", tags=["Fluxo Atendimento"])
 
 @app.get("/")
 async def root():

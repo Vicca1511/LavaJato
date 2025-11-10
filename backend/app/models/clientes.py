@@ -15,6 +15,7 @@ class Cliente(Base):
     
     # Relacionamento com Veículos
     veiculos = relationship("Veiculo", back_populates="cliente")
+    # ordens_servico = relationship("OrdemServico", back_populates="cliente", cascade="all, delete-orphan")
     
     def __repr__(self):
         return f"<Cliente {self.nome} - {self.cpf}>"
